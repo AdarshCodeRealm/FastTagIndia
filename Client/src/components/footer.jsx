@@ -1,4 +1,4 @@
-import { Car, Facebook, Twitter, Instagram, Linkedin, Mail, Phone, MapPin, Building2, FileText, Shield, CreditCard } from "lucide-react";
+import { Car, Facebook, Twitter, Instagram, Linkedin, Mail, MapPin, Building2, FileText, Shield, CreditCard } from "lucide-react";
 
 const navigationSections = {
   services: [
@@ -56,7 +56,7 @@ export function Footer() {
             </a>
             
             <p className="text-slate-300 leading-relaxed mb-6 max-w-sm">
-              India's most trusted FASTag provider with instant activation, secure payments, and 24/7 support.
+              India&apos;s most trusted FASTag provider with instant activation, secure payments, and 24/7 support.
             </p>
 
             {/* Social Links */}

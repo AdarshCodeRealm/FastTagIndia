@@ -23,12 +23,12 @@ export function Header() {
           <div className="flex items-center justify-between h-10 text-sm">
             <div className="flex items-center gap-2">
               <Phone className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Toll-free:</span>
-              <span className="font-medium">1800-XXX-XXXX</span>
+              <span className="hidden sm:inline">Support:</span>
+              <span className="font-medium">+91 9172727232</span>
             </div>
             <div className="hidden md:flex items-center gap-1">
               <Zap className="h-3.5 w-3.5" />
-              <span>Instant FASTag activation | 24/7 support</span>
+              <span className="font-medium">Instant FASTag activation | Powered by <a href="https://nexaraintl.com/" target="_blank" className="text-white underline">Nexara International</a></span>
             </div>
             <div className="flex items-center gap-4">
               <a href="/login" className="hover:underline">
@@ -57,7 +57,7 @@ export function Header() {
                 <Car className="h-6 w-6 text-primary-foreground" />
               </div>
               <span className="font-bold text-xl text-foreground">
-                FasTag<span className="text-primary">India</span>
+                FastTag<span className="text-primary">INDIA</span>
               </span>
             </a>
 
@@ -108,13 +108,13 @@ export function Header() {
                   </a>
                 </NavigationMenuItem>
 
-                <NavigationMenuItem>
+                {/* <NavigationMenuItem>
                   <a href="/pricing">
                     <NavigationMenuLink className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-muted hover:text-foreground focus:bg-muted focus:text-foreground focus:outline-none">
                       Plans & Fees
                     </NavigationMenuLink>
                   </a>
-                </NavigationMenuItem>
+                </NavigationMenuItem> */}
 
                 <NavigationMenuItem>
                   <a href="/toll-rates">

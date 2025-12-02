@@ -5,13 +5,13 @@ const navigationSections = {
     { name: "Buy FASTag", href: "/buy-fastag" }, // ✅ Exists
     { name: "Recharge FASTag", href: "/recharge-fastag" }, // ✅ Exists  
     { name: "Track Order", href: "/track-order" }, // ✅ Exists
-    { name: "Balance Check", href: "/" }, // → Redirect to home (doesn't exist)
+    { name: "Toll Rates", href: "/toll-rates" }, // ✅ Now exists
   ],
   support: [
+    { name: "Customer Support", href: "/support" }, // ✅ Now exists
     { name: "Help Center", href: "/" }, // → Redirect to home (doesn't exist)
-    { name: "Customer Support", href: "/" }, // → Redirect to home (doesn't exist)
-    { name: "FAQ", href: "/" }, // → Redirect to home (doesn't exist)
-    { name: "Contact Us", href: "/" }, // → Redirect to home (doesn't exist)
+    { name: "FAQ", href: "/support" }, // → Redirect to support page
+    { name: "Contact Us", href: "/support" }, // → Redirect to support page
   ],
   company: [
     { name: "About Us", href: "/" }, // → Redirect to home (doesn't exist)
@@ -20,9 +20,9 @@ const navigationSections = {
     { name: "Partners", href: "/" }, // → Redirect to home (doesn't exist)
   ],
   legal: [
-    { name: "Terms & Conditions", href: "/" }, // → Redirect to home (doesn't exist)
-    { name: "Privacy Policy", href: "/" }, // → Redirect to home (doesn't exist)
-    { name: "Refund Policy", href: "/" }, // → Redirect to home (doesn't exist)
+    { name: "Terms & Conditions", href: "/terms-conditions" }, // ✅ Now exists
+    { name: "Privacy Policy", href: "/privacy-policy" }, // ✅ Now exists
+    { name: "Refund Policy", href: "/refund-policy" }, // ✅ Now exists
     { name: "Security", href: "/" }, // → Redirect to home (doesn't exist)
   ],
 };
@@ -49,9 +49,9 @@ export function Footer() {
               </div>
               <div>
                 <span className="font-bold text-2xl">
-                  FasTag<span className="text-primary">India</span>
+                  FastTag<span className="text-primary">INDIA</span>
                 </span>
-                <p className="text-xs text-slate-400 -mt-1">Fastest FASTag Provider</p>
+                <p className="text-xs text-slate-400 -mt-1">A Service by Nexara International</p>
               </div>
             </a>
             
@@ -182,8 +182,8 @@ export function Footer() {
                       href={link.href}
                       className="text-slate-400 hover:text-primary transition-colors text-sm hover:underline underline-offset-4"
                       onClick={(e) => {
-                        // Add click handler for non-existent pages
-                        if (link.href === "/") {
+                        // Only show alert for non-existent pages (Security page)
+                        if (link.href === "/" && link.name === "Security") {
                           e.preventDefault();
                           alert(`${link.name} page is coming soon! Redirecting to home.`);
                           window.location.href = "/";
@@ -217,48 +217,40 @@ export function Footer() {
                   <div className="flex-1">
                     <h4 className="font-semibold text-white text-sm mb-1">Headquarters</h4>
                     <p className="text-slate-300 text-sm leading-relaxed">
-                      FasTagIndia Pvt. Ltd.<br />
-                      Andheri East, Mumbai<br />
-                      Maharashtra 400069, India
+                      FasTagIndia<br />
+                      Office No 145, 93 Avenue Mall<br />
+                      Wanowrie, Pune<br />
+                      Maharashtra 411022, India
                     </p>
                   </div>
                 </div>
               </div>
 
-              {/* Contact Email */}
+              {/* Contact Details */}
               <div className="group">
                 <div className="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-800/30 transition-all">
                   <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-primary flex items-center justify-center shadow-lg flex-shrink-0">
                     <Mail className="h-5 w-5 text-white" />
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-semibold text-white text-sm mb-1">Business Email</h4>
-                    <p className="text-slate-300 text-sm">
-                      business@fastagindia.in
+                    <h4 className="font-semibold text-white text-sm mb-1">Contact Details</h4>
+                    <p className="text-slate-300 text-sm mb-2">
+                      <a 
+                        href="mailto:business@fastagindia.in?subject=Business Inquiry" 
+                        className="hover:text-primary transition-colors"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        business@fastagindia.in
+                      </a>
                     </p>
-                    <p className="text-slate-400 text-xs mt-1">For partnerships & inquiries</p>
+                    <p className="text-slate-300 text-sm">
+                      Phone: <a href="tel:+919172727232" className="hover:text-primary transition-colors">+91 9172727232</a>
+                    </p>
+                    <p className="text-slate-400 text-xs mt-1">24/7 Customer Support</p>
                   </div>
                 </div>
               </div>
-
-              {/* Registration Details */}
-              {/*<div className="bg-slate-800/20 backdrop-blur-sm rounded-lg p-4 border border-slate-700/30">
-                <h4 className="font-semibold text-white text-sm mb-3">Registration Details</h4>
-                <div className="space-y-2 text-xs">
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">GSTIN:</span>
-                    <span className="text-slate-300">27XXXXX1234X1ZX</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">CIN:</span>
-                    <span className="text-slate-300">U74999MH2020PTC123456</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">PAN:</span>
-                    <span className="text-slate-300">AAACT1234C</span>
-                  </div>
-                </div>
-              </div>*/}
 
             </div>
           </div>
@@ -275,10 +267,17 @@ export function Footer() {
             {/* Copyright */}
             <div className="text-center md:text-left">
               <p className="text-slate-400 text-sm">
-                © {new Date().getFullYear()} <span className="text-white font-medium">FasTagIndia Pvt. Ltd.</span> All rights reserved.
+                © {new Date().getFullYear()} <span className="text-white font-medium">FastTagINDIA</span> All rights reserved.
               </p>
               <p className="text-slate-500 text-xs mt-1">
-                Authorized FASTag provider • RBI Compliant • ISO 27001 Certified
+                A service by <a 
+                  href="https://nexaraintl.com" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="text-primary hover:text-primary/80 transition-colors font-medium"
+                >
+                  Nexara International
+                </a> • RBI Compliant • ISO 27001 Certified
               </p>
             </div>
 

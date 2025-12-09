@@ -1,0 +1,1055 @@
+{
+  "info": {
+    "name": "FASTag India - OTP System API",
+    "description": "Complete API collection for FASTag India OTP system including authentication, email OTP, SMS OTP, user management, and role-based admin login",
+    "version": "1.1.1",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3001/api",
+      "description": "Base API URL"
+    },
+    {
+      "key": "admin_email",
+      "value": "admin@nexara.com",
+      "description": "Primary admin email for testing admin login"
+    },
+    {
+      "key": "admin_password",
+      "value": "Admin@123",
+      "description": "Primary admin password for testing admin login"
+    },
+    {
+      "key": "regional_admin_email",
+      "value": "admin.regional@nexara.com",
+      "description": "Regional admin email for testing admin login"
+    },
+    {
+      "key": "regional_admin_password",
+      "value": "RegionalAdmin@123",
+      "description": "Regional admin password for testing admin login"
+    },
+    {
+      "key": "test_user1_email",
+      "value": "adarshramgirwar1@gmail.com",
+      "description": "Test user 1 email for login"
+    },
+    {
+      "key": "test_user1_password",
+      "value": "securepassword123",
+      "description": "Test user 1 password for login"
+    },
+    {
+      "key": "test_user2_email",
+      "value": "mirza54727@gmail.com",
+      "description": "Test user 2 email for login"
+    },
+    {
+      "key": "test_user2_password",
+      "value": "Mirza@123",
+      "description": "Test user 2 password for login"
+    },
+    {
+      "key": "test_user3_email",
+      "value": "priya.sharma@example.com",
+      "description": "Test user 3 email for login"
+    },
+    {
+      "key": "test_user3_password",
+      "value": "Priya@2024",
+      "description": "Test user 3 password for login"
+    },
+    {
+      "key": "test_user4_email",
+      "value": "raj.kumar@example.com",
+      "description": "Test user 4 email for login"
+    },
+    {
+      "key": "test_user4_password",
+      "value": "Raj@2024",
+      "description": "Test user 4 password for login"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "description": "JWT access token for authenticated requests"
+    },
+    {
+      "key": "refresh_token",
+      "value": "",
+      "description": "JWT refresh token"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "🔐 Authentication",
+      "item": [
+        {
+          "name": "Admin Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.success && response.data.accessToken) {",
+                  "        pm.collectionVariables.set('access_token', response.data.accessToken);",
+                  "        pm.collectionVariables.set('refresh_token', response.data.refreshToken);",
+                  "    }",
+                  "    pm.test('Admin login successful', function () {",
+                  "        pm.expect(response.success).to.be.true;",
+                  "        pm.expect(response.data).to.have.property('user');",
+                  "        pm.expect(response.data.user.role).to.eql('admin');",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{admin_email}}\",\n  \"password\": \"{{admin_password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/admin-login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "admin-login"
+              ]
+            },
+            "description": "Login as the primary admin using email and password"
+          }
+        },
+        {
+          "name": "Regional Admin Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{regional_admin_email}}\",\n  \"password\": \"{{regional_admin_password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/admin-login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "admin-login"
+              ]
+            },
+            "description": "Login as the regional admin using email and password"
+          }
+        },
+        {
+          "name": "Register User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.test('User registered successfully', function () {",
+                  "        pm.expect(response.success).to.be.true;",
+                  "        pm.expect(response.data).to.have.property('_id');",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Adarsh Ramgirwar\",\n  \"email\": \"{{test_user1_email}}\",\n  \"phone\": \"{{test_phone}}\",\n  \"password\": \"securepassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            },
+            "description": "Register a new user with email and phone"
+          }
+        },
+        {
+          "name": "Test User 1 Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.success && response.data.accessToken) {",
+                  "        pm.collectionVariables.set('access_token', response.data.accessToken);",
+                  "        pm.collectionVariables.set('refresh_token', response.data.refreshToken);",
+                  "    }",
+                  "    pm.test('Login successful', function () {",
+                  "        pm.expect(response.success).to.be.true;",
+                  "        pm.expect(response.data).to.have.property('user');",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{test_user1_email}}\",\n  \"password\": \"{{test_user1_password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Login as Test User 1"
+          }
+        },
+        {
+          "name": "Test User 2 Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.success && response.data.accessToken) {",
+                  "        pm.collectionVariables.set('access_token', response.data.accessToken);",
+                  "        pm.collectionVariables.set('refresh_token', response.data.refreshToken);",
+                  "    }",
+                  "    pm.test('Login successful', function () {",
+                  "        pm.expect(response.success).to.be.true;",
+                  "        pm.expect(response.data).to.have.property('user');",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{test_user2_email}}\",\n  \"password\": \"{{test_user2_password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Login as Test User 2"
+          }
+        },
+        {
+          "name": "Test User 3 Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.success && response.data.accessToken) {",
+                  "        pm.collectionVariables.set('access_token', response.data.accessToken);",
+                  "        pm.collectionVariables.set('refresh_token', response.data.refreshToken);",
+                  "    }",
+                  "    pm.test('Login successful', function () {",
+                  "        pm.expect(response.success).to.be.true;",
+                  "        pm.expect(response.data).to.have.property('user');",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{test_user3_email}}\",\n  \"password\": \"{{test_user3_password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Login as Test User 3"
+          }
+        },
+        {
+          "name": "Test User 4 Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.success && response.data.accessToken) {",
+                  "        pm.collectionVariables.set('access_token', response.data.accessToken);",
+                  "        pm.collectionVariables.set('refresh_token', response.data.refreshToken);",
+                  "    }",
+                  "    pm.test('Login successful', function () {",
+                  "        pm.expect(response.success).to.be.true;",
+                  "        pm.expect(response.data).to.have.property('user');",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{test_user4_email}}\",\n  \"password\": \"{{test_user4_password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Login as Test User 4"
+          }
+        },
+        {
+          "name": "Login with OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{test_user1_email}}\",\n  \"otp\": \"123456\",\n  \"type\": \"email\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login-otp",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login-otp"
+              ]
+            },
+            "description": "Login using OTP instead of password"
+          }
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/current-user",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "current-user"
+              ]
+            },
+            "description": "Get current authenticated user details"
+          }
+        },
+        {
+          "name": "Refresh Access Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.success && response.data.accessToken) {",
+                  "        pm.collectionVariables.set('access_token', response.data.accessToken);",
+                  "        pm.collectionVariables.set('refresh_token', response.data.refreshToken);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refresh_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/refresh-token",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "refresh-token"
+              ]
+            },
+            "description": "Refresh expired access token"
+          }
+        },
+        {
+          "name": "Logout User",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/logout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            },
+            "description": "Logout current user"
+          }
+        }
+      ],
+      "description": "Authentication endpoints for admins and test users"
+    },
+    {
+      "name": "📧 Email OTP",
+      "item": [
+        {
+          "name": "Send Email OTP - Verification",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Email OTP sent successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.success).to.be.true;",
+                  "    pm.expect(response.data).to.have.property('identifier');",
+                  "    pm.expect(response.data.type).to.eql('email');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{test_user1_email}}\",\n  \"purpose\": \"verification\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/send-email-otp",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "send-email-otp"
+              ]
+            },
+            "description": "Send OTP to email for verification"
+          }
+        },
+        {
+          "name": "Send Email OTP - Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{test_user1_email}}\",\n  \"purpose\": \"login\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/send-email-otp",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "send-email-otp"
+              ]
+            },
+            "description": "Send OTP to email for login"
+          }
+        },
+        {
+          "name": "Send Email OTP - Password Reset",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{test_user1_email}}\",\n  \"purpose\": \"forgot_password\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/send-email-otp",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "send-email-otp"
+              ]
+            },
+            "description": "Send OTP to email for password reset"
+          }
+        },
+        {
+          "name": "Verify Email OTP",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Email OTP verified successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.success).to.be.true;",
+                  "    pm.expect(response.data).to.have.property('verifiedAt');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{test_user1_email}}\",\n  \"otp\": \"123456\",\n  \"purpose\": \"verification\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/verify-email-otp",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "verify-email-otp"
+              ]
+            },
+            "description": "Verify OTP received via email"
+          }
+        }
+      ],
+      "description": "Email OTP related endpoints"
+    },
+    {
+      "name": "📱 SMS OTP",
+      "item": [
+        {
+          "name": "Send SMS OTP - Verification",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('SMS OTP sent successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.success).to.be.true;",
+                  "    pm.expect(response.data).to.have.property('identifier');",
+                  "    pm.expect(response.data.type).to.eql('sms');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"{{test_phone}}\",\n  \"purpose\": \"verification\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/send-sms-otp",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "send-sms-otp"
+              ]
+            },
+            "description": "Send OTP to phone via SMS"
+          }
+        },
+        {
+          "name": "Send SMS OTP - Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"{{test_phone}}\",\n  \"purpose\": \"login\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/send-sms-otp",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "send-sms-otp"
+              ]
+            },
+            "description": "Send OTP to phone for login"
+          }
+        },
+        {
+          "name": "Verify SMS OTP",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('SMS OTP verified successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.success).to.be.true;",
+                  "    pm.expect(response.data).to.have.property('verifiedAt');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"{{test_phone}}\",\n  \"otp\": \"123456\",\n  \"purpose\": \"verification\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/verify-sms-otp",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "verify-sms-otp"
+              ]
+            },
+            "description": "Verify OTP received via SMS"
+          }
+        }
+      ],
+      "description": "SMS OTP related endpoints"
+    },
+    {
+      "name": "🔄 OTP Utilities",
+      "item": [
+        {
+          "name": "Resend Email OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identifier\": \"{{test_user1_email}}\",\n  \"type\": \"email\",\n  \"purpose\": \"verification\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/resend-otp",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "resend-otp"
+              ]
+            },
+            "description": "Resend OTP to email"
+          }
+        },
+        {
+          "name": "Resend SMS OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identifier\": \"{{test_phone}}\",\n  \"type\": \"sms\",\n  \"purpose\": \"verification\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/resend-otp",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "resend-otp"
+              ]
+            },
+            "description": "Resend OTP to phone"
+          }
+        }
+      ],
+      "description": "OTP utility endpoints"
+    },
+    {
+      "name": "🔑 Password Management",
+      "item": [
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{test_user1_email}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/forgot-password",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "forgot-password"
+              ]
+            },
+            "description": "Request password reset OTP"
+          }
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{test_user1_email}}\",\n  \"otp\": \"123456\",\n  \"newPassword\": \"newSecurePassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/reset-password",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "reset-password"
+              ]
+            },
+            "description": "Reset password using OTP"
+          }
+        }
+      ],
+      "description": "Password management endpoints"
+    },
+    {
+      "name": "🧪 Test Endpoints",
+      "item": [
+        {
+          "name": "Test Email Service",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/test/test-email",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "test",
+                "test-email"
+              ]
+            },
+            "description": "Test email service connection"
+          }
+        },
+        {
+          "name": "Test SMS Service",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/test/test-sms",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "test",
+                "test-sms"
+              ]
+            },
+            "description": "Test SMS service configuration"
+          }
+        },
+        {
+          "name": "Test OTP Generation",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/test/test-otp-generation",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "test",
+                "test-otp-generation"
+              ]
+            },
+            "description": "Test OTP generation functionality"
+          }
+        },
+        {
+          "name": "Send Test Email OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{test_user1_email}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/test/send-test-email-otp",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "test",
+                "send-test-email-otp"
+              ]
+            },
+            "description": "Send test email OTP"
+          }
+        },
+        {
+          "name": "Send Test SMS OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"{{test_phone}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/test/send-test-sms-otp",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "test",
+                "send-test-sms-otp"
+              ]
+            },
+            "description": "Send test SMS OTP"
+          }
+        }
+      ],
+      "description": "Test and debugging endpoints"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Set request timestamp",
+          "pm.globals.set('timestamp', new Date().toISOString());"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Log response time",
+          "pm.test('Response time is acceptable', function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(5000);",
+          "});",
+          "",
+          "// Log status code",
+          "console.log('Response Status:', pm.response.code, pm.response.status);"
+        ]
+      }
+    }
+  ]
+}

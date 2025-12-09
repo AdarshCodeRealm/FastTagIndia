@@ -1,15 +1,16 @@
-import  { useState } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { Label } from '../components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
-import { Car, Phone, Mail, Lock, ArrowRight, Shield, Zap, ArrowLeft, Home } from 'lucide-react'
+import { Car, Phone, Mail, Lock, ArrowRight, Shield, Zap, ArrowLeft, Home, AlertCircle } from 'lucide-react'
+import { useAuth } from '../context/AuthContext'
 
 export default function LoginPage() {
   const navigate = useNavigate()
-  const [isLoading, setIsLoading] = useState(false)
-  const [loginMethod, setLoginMethod] = useState('phone')
+  const { loginUser, isLoading, error, clearError } = useAuth()
+  const [loginMethod, setLoginMethod] = useState('email') // Default to email since that's what you're testing
   const [formData, setFormData] = useState({
     phone: '',
     email: '',
@@ -17,22 +18,41 @@ export default function LoginPage() {
     otp: '',
   })
   const [otpSent, setOtpSent] = useState(false)
+  const [loginError, setLoginError] = useState('')
 
   const handleSendOtp = async () => {
-    setIsLoading(true)
-    // Simulate OTP sending
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+    // OTP functionality can be implemented later
     setOtpSent(true)
-    setIsLoading(false)
   }
 
   const handleLogin = async (e) => {
     e.preventDefault()
-    setIsLoading(true)
-    // Simulate login
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-    setIsLoading(false)
-    navigate('/')
+    setLoginError('')
+    clearError()
+
+    console.log('🔑 Login attempt started')
+    console.log('📧 Email:', formData.email)
+    console.log('🔒 Password provided:', !!formData.password)
+
+    if (loginMethod === 'email') {
+      // Use AuthContext for email/password login
+      const result = await loginUser(formData.email, formData.password)
+      
+      console.log('🔄 Login result:', result)
+
+      if (result.success) {
+        console.log('✅ Login successful, navigating to buy-fastag')
+        // Navigate to buy-fastag as requested
+        navigate('/buy-fastag')
+      } else {
+        console.error('❌ Login failed:', result.error)
+        setLoginError(result.error || 'Login failed. Please try again.')
+      }
+    } else {
+      // OTP login logic can be implemented here
+      console.log('📱 OTP login not implemented yet')
+      setLoginError('OTP login is not implemented yet. Please use email login.')
+    }
   }
 
   return (
@@ -122,6 +142,19 @@ export default function LoginPage() {
               <CardDescription>Choose your preferred login method</CardDescription>
             </CardHeader>
             <CardContent>
+              {/* Error Display */}
+              {(error || loginError) && (
+                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <div className="flex items-start gap-2">
+                    <AlertCircle className="h-4 w-4 text-red-600 mt-0.5" />
+                    <div className="text-sm text-red-800">
+                      <p className="font-medium">Login Failed</p>
+                      <p>{error || loginError}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className="grid w-full grid-cols-2 mb-6 bg-muted rounded-lg p-1">
                 <button
                   onClick={() => setLoginMethod('phone')}
@@ -149,6 +182,7 @@ export default function LoginPage() {
 
               {loginMethod === 'phone' ? (
                 <form onSubmit={handleLogin} className="space-y-4">
+                  {/* Phone Login Form */}
                   <div className="space-y-2">
                     <Label htmlFor="phone">Mobile Number</Label>
                     <div className="relative">
@@ -213,6 +247,7 @@ export default function LoginPage() {
                 </form>
               ) : (
                 <form onSubmit={handleLogin} className="space-y-4">
+                  {/* Email Login Form */}
                   <div className="space-y-2">
                     <Label htmlFor="email">Email Address</Label>
                     <div className="relative">
@@ -250,7 +285,11 @@ export default function LoginPage() {
                     </div>
                   </div>
 
-                  <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={isLoading}>
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-primary hover:bg-primary/90" 
+                    disabled={isLoading}
+                  >
                     {isLoading ? 'Logging in...' : 'Login'}
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
@@ -263,16 +302,26 @@ export default function LoginPage() {
                   Sign up
                 </Link>
               </div>
+
+              {/* Admin Login Link */}
+              <div className="mt-4 text-center">
+                <Link 
+                  to="/admin/login" 
+                  className="text-xs text-muted-foreground hover:text-primary transition-colors"
+                >
+                  Admin Login
+                </Link>
+              </div>
             </CardContent>
           </Card>
 
           <p className="text-center text-xs text-muted-foreground mt-6">
             By logging in, you agree to our{' '}
-            <Link to="/terms" className="text-primary hover:underline">
+            <Link to="/terms-conditions" className="text-primary hover:underline">
               Terms of Service
             </Link>{' '}
             and{' '}
-            <Link to="/privacy" className="text-primary hover:underline">
+            <Link to="/privacy-policy" className="text-primary hover:underline">
               Privacy Policy
             </Link>
           </p>

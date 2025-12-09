@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
+import { AuthPopup } from "@/components/AuthPopup";
+import { useAuth } from "@/context/AuthContext";
+import invoiceService from "@/services/invoice";
 import {
   Car,
   Truck,
@@ -31,6 +34,10 @@ import {
   BadgeCheck,
   X,
   FileText,
+  Lock,
+  AlertCircle,
+  Download,
+  ExternalLink,
 } from "lucide-react";
 
 const vehicleTypes = [
@@ -60,21 +67,24 @@ const states = [
 export default function BuyFASTag() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [showAuthPopup, setShowAuthPopup] = useState(false);
+  const [allowBrowsing, setAllowBrowsing] = useState(false);
+  const [orderComplete, setOrderComplete] = useState(false);
+  const [completedOrderData, setCompletedOrderData] = useState(null);
+  const [isDownloadingInvoice, setIsDownloadingInvoice] = useState(false);
 
   const rcFileInputRef = useRef(null);
   const aadhaarFileInputRef = useRef(null);
 
   const [formData, setFormData] = useState({
-    // Step 1 - Vehicle Type
     vehicleType: searchParams.get("type") || "",
-    // Step 2 - Vehicle Details
     vehicleNumber: "",
     chassisNumber: "",
     engineNumber: "",
     vehicleClass: "",
-    // Step 3 - KYC Documents
     ownerName: "",
     email: "",
     phone: "",
@@ -84,16 +94,13 @@ export default function BuyFASTag() {
     aadhaarDocument: null,
     rcPreview: "",
     aadhaarPreview: "",
-    // Step 4 - Bank Selection
     selectedBank: "",
-    // Step 5 - Delivery
     addressLine1: "",
     addressLine2: "",
     city: "",
     state: "",
     pincode: "",
     deliveryOption: "standard",
-    // Step 6 - Payment
     initialBalance: "200",
     agreeTerms: false,
   });
@@ -118,7 +125,18 @@ export default function BuyFASTag() {
     return tagPrice + securityDeposit + initialBalance + deliveryFee;
   };
 
+  useEffect(() => {
+    if (!isAuthenticated && !allowBrowsing) {
+      setShowAuthPopup(true);
+    }
+  }, [isAuthenticated, allowBrowsing]);
+
   const handleNext = () => {
+    if (currentStep === 5 && !isAuthenticated) {
+      setShowAuthPopup(true);
+      return;
+    }
+    
     if (currentStep < 6) {
       setCurrentStep(currentStep + 1);
       window.scrollTo(0, 0);
@@ -133,10 +151,68 @@ export default function BuyFASTag() {
   };
 
   const handleSubmit = async () => {
+    if (!isAuthenticated) {
+      setShowAuthPopup(true);
+      return;
+    }
+
     setIsLoading(true);
+    
     await new Promise((resolve) => setTimeout(resolve, 2000));
+    
+    const orderData = {
+      orderId: 'FL' + Math.random().toString(36).substring(2, 8).toUpperCase(),
+      vehicleNumber: formData.vehicleNumber,
+      amount: calculateTotal(),
+      orderDate: new Date().toISOString(),
+      paymentMethod: 'Online Payment',
+      status: 'confirmed',
+      deliveryAddress: `${formData.addressLine1}, ${formData.addressLine2}, ${formData.city}, ${formData.state} - ${formData.pincode}`,
+      tagDetails: {
+        vehicleType: getSelectedVehicle()?.name,
+        issuingBank: banks.find(b => b.id === formData.selectedBank)?.name,
+        tagColor: 'Purple',
+        initialBalance: parseInt(formData.initialBalance)
+      },
+      customerName: formData.ownerName,
+      customerEmail: formData.email,
+      customerPhone: formData.phone,
+      deliveryCharge: formData.deliveryOption === 'express' ? 99 : 0
+    };
+
+    setCompletedOrderData(orderData);
+    setOrderComplete(true);
     setIsLoading(false);
-    navigate("/track-order?orderId=FL" + Math.random().toString(36).substring(2, 8).toUpperCase());
+  };
+
+  const handleDownloadInvoice = async () => {
+    if (!completedOrderData) return;
+
+    setIsDownloadingInvoice(true);
+    console.log('🧾 Downloading purchase invoice...');
+
+    try {
+      const enhancedOrderData = {
+        ...completedOrderData,
+        user: user
+      };
+
+      const result = invoiceService.downloadInvoice(enhancedOrderData, 'purchase');
+      
+      if (result.success) {
+        console.log('✅ Purchase invoice downloaded successfully');
+      } else {
+        console.error('❌ Invoice download failed:', result.error);
+      }
+    } catch (error) {
+      console.error('💥 Error downloading invoice:', error);
+    } finally {
+      setIsDownloadingInvoice(false);
+    }
+  };
+
+  const handleViewOrder = () => {
+    navigate(`/track-order?orderId=${completedOrderData.orderId}`);
   };
 
   const handleRcFileChange = (e) => {
@@ -167,9 +243,115 @@ export default function BuyFASTag() {
     if (aadhaarFileInputRef.current) aadhaarFileInputRef.current.value = "";
   };
 
+  const handleAuthPopupClose = () => {
+    setShowAuthPopup(false);
+    setAllowBrowsing(true);
+  };
+
+  if (orderComplete && completedOrderData) {
+    return (
+      <div className="min-h-screen flex flex-col bg-muted/30">
+        <Header />
+        
+        <main className="flex-1 container mx-auto px-4 py-8">
+          <div className="max-w-2xl mx-auto">
+            <Card className="border-green-200 bg-green-50">
+              <CardContent className="p-8 text-center">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <CheckCircle2 className="h-8 w-8 text-green-600" />
+                </div>
+                
+                <h1 className="text-2xl font-bold text-green-900 mb-2">Order Placed Successfully!</h1>
+                <p className="text-green-700 mb-6">
+                  Your FASTag order has been confirmed and will be delivered soon.
+                </p>
+                
+                <div className="bg-white rounded-lg p-4 mb-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div className="text-left">
+                      <p className="text-muted-foreground">Order ID</p>
+                      <p className="font-medium">{completedOrderData.orderId}</p>
+                    </div>
+                    <div className="text-left">
+                      <p className="text-muted-foreground">Vehicle Number</p>
+                      <p className="font-medium">{completedOrderData.vehicleNumber}</p>
+                    </div>
+                    <div className="text-left">
+                      <p className="text-muted-foreground">Amount Paid</p>
+                      <p className="font-medium text-green-600">₹{completedOrderData.amount}</p>
+                    </div>
+                    <div className="text-left">
+                      <p className="text-muted-foreground">Payment Method</p>
+                      <p className="font-medium">{completedOrderData.paymentMethod}</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Button 
+                      onClick={handleDownloadInvoice}
+                      disabled={isDownloadingInvoice}
+                      className="flex-1"
+                      variant="outline"
+                    >
+                      {isDownloadingInvoice ? (
+                        <>
+                          <Download className="mr-2 h-4 w-4 animate-pulse" />
+                          Generating...
+                        </>
+                      ) : (
+                        <>
+                          <Download className="mr-2 h-4 w-4" />
+                          Download Invoice
+                        </>
+                      )}
+                    </Button>
+                    
+                    <Button onClick={handleViewOrder} className="flex-1">
+                      <ExternalLink className="mr-2 h-4 w-4" />
+                      Track Order
+                    </Button>
+                  </div>
+                  
+                  <Button 
+                    variant="ghost" 
+                    onClick={() => navigate('/buy-fastag')}
+                    className="w-full"
+                  >
+                    Buy Another FASTag
+                  </Button>
+                </div>
+                
+                <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                  <h3 className="font-medium text-blue-900 mb-2">What's Next?</h3>
+                  <ul className="text-sm text-blue-800 space-y-1">
+                    <li>• Your FASTag will be activated within 30 minutes</li>
+                    <li>• You'll receive SMS confirmation once activated</li>
+                    <li>• Track your delivery using the order ID</li>
+                    <li>• Keep your RC and KYC documents handy for verification</li>
+                  </ul>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </main>
+        
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-muted/30">
       <Header />
+
+      <AuthPopup 
+        isOpen={showAuthPopup}
+        onClose={handleAuthPopupClose}
+        feature="FASTag purchase and secure payment"
+        allowSkip={currentStep < 6}
+      />
 
       <main className="flex-1 container mx-auto px-4 py-8">
         {/* Page Header */}
@@ -178,6 +360,43 @@ export default function BuyFASTag() {
           <p className="text-muted-foreground max-w-xl mx-auto">
             Get your FASTag delivered and activated in 30 minutes. Accepted at all national toll plazas.
           </p>
+          
+          {!isAuthenticated && allowBrowsing && (
+            <div className="max-w-md mx-auto mt-4">
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                <div className="flex items-start gap-2">
+                  <AlertCircle className="h-4 w-4 text-yellow-600 mt-0.5" />
+                  <div className="text-sm text-yellow-800">
+                    <p className="font-medium">Browsing Mode</p>
+                    <p className="text-xs mt-1">
+                      You can browse and fill details, but{' '}
+                      <button 
+                        onClick={() => setShowAuthPopup(true)}
+                        className="text-yellow-700 hover:underline font-medium"
+                      >
+                        login is required
+                      </button>{' '}
+                      for payment.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {isAuthenticated && (
+            <div className="max-w-md mx-auto mt-4">
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                  <p className="text-sm text-green-800">
+                    Welcome back, <span className="font-medium">{user?.name?.split(' ')[0]}</span>! 
+                    Ready to purchase your FASTag.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Progress Steps */}

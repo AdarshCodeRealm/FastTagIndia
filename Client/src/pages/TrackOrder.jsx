@@ -1,4 +1,4 @@
-import  { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
@@ -6,19 +6,21 @@ import { Label } from '../components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Header } from '../components/header'
 import { Footer } from '../components/footer'
+import { useAuth } from '../context/AuthContext'
+import invoiceService from '../services/invoice'
 import { 
   Package, 
   Truck, 
   CheckCircle2, 
-  
   MapPin, 
   Phone, 
   Mail,
   Search,
   Calendar,
-  
   Download,
-  ExternalLink
+  ExternalLink,
+  FileText,
+  Share
 } from 'lucide-react'
 
 const orderStatuses = [
@@ -53,6 +55,8 @@ export default function TrackOrderPage() {
   const [orderData, setOrderData] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+  const [isDownloadingInvoice, setIsDownloadingInvoice] = useState(false)
+  const { user } = useAuth()
 
   useEffect(() => {
     const orderId = searchParams.get('orderId')
@@ -85,6 +89,64 @@ export default function TrackOrderPage() {
   const getStatusIndex = (status) => {
     return orderStatuses.findIndex(s => s.id === status)
   }
+
+  const handleDownloadInvoice = async () => {
+    if (!orderData) return;
+
+    setIsDownloadingInvoice(true);
+    console.log('🧾 Starting invoice download...');
+
+    try {
+      // Enhance order data with user information
+      const enhancedOrderData = {
+        ...orderData,
+        user: user,
+        customerName: user?.name || 'Customer',
+        customerEmail: user?.email || 'customer@email.com',
+        customerPhone: user?.phone || 'N/A',
+        paymentMethod: orderData.paymentMethod || 'Online Payment'
+      };
+
+      console.log('📋 Enhanced order data for invoice:', enhancedOrderData);
+
+      // Generate and download invoice
+      const result = invoiceService.downloadInvoice(enhancedOrderData, 'purchase');
+      
+      if (result.success) {
+        console.log('✅ Invoice downloaded successfully:', result.invoiceNumber);
+      } else {
+        console.error('❌ Invoice download failed:', result.error);
+        setError('Failed to generate invoice. Please try again.');
+      }
+    } catch (error) {
+      console.error('💥 Error in invoice download:', error);
+      setError('An error occurred while generating the invoice.');
+    } finally {
+      setIsDownloadingInvoice(false);
+    }
+  };
+
+  const handleDownloadInvoiceHTML = async () => {
+    if (!orderData) return;
+
+    try {
+      const enhancedOrderData = {
+        ...orderData,
+        user: user,
+        customerName: user?.name || 'Customer',
+        customerEmail: user?.email || 'customer@email.com',
+        customerPhone: user?.phone || 'N/A'
+      };
+
+      const result = invoiceService.downloadInvoiceHTML(enhancedOrderData, 'purchase');
+      
+      if (result.success) {
+        console.log('✅ HTML invoice downloaded successfully');
+      }
+    } catch (error) {
+      console.error('❌ Error downloading HTML invoice:', error);
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-muted/30">
@@ -303,21 +365,70 @@ export default function TrackOrderPage() {
                   </div>
 
                   <div className="space-y-3 pt-4 border-t">
-                    <Button variant="outline" className="w-full">
-                      <Download className="mr-2 h-4 w-4" />
-                      Download Invoice
+                    {/* Primary Download Button */}
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={handleDownloadInvoice}
+                      disabled={isDownloadingInvoice}
+                    >
+                      {isDownloadingInvoice ? (
+                        <>
+                          <Download className="mr-2 h-4 w-4 animate-pulse" />
+                          Generating...
+                        </>
+                      ) : (
+                        <>
+                          <Download className="mr-2 h-4 w-4" />
+                          Download Invoice
+                        </>
+                      )}
                     </Button>
+
+                    {/* Secondary Options */}
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        className="flex-1 text-xs"
+                        onClick={handleDownloadInvoiceHTML}
+                      >
+                        <FileText className="mr-1 h-3 w-3" />
+                        Save HTML
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        className="flex-1 text-xs"
+                        onClick={() => {
+                          if (navigator.share) {
+                            navigator.share({
+                              title: `Invoice - ${orderData.orderId}`,
+                              text: `FASTag purchase invoice for order ${orderData.orderId}`,
+                              url: window.location.href
+                            });
+                          } else {
+                            // Fallback: copy to clipboard
+                            navigator.clipboard.writeText(window.location.href);
+                            alert('Order link copied to clipboard!');
+                          }
+                        }}
+                      >
+                        <Share className="mr-1 h-3 w-3" />
+                        Share
+                      </Button>
+                    </div>
                     
                     <div className="text-center">
                       <p className="text-sm text-muted-foreground mb-2">Need help?</p>
                       <div className="space-y-1">
-                        <Link to="tel:+911800123456" className="flex items-center justify-center gap-2 text-sm text-primary hover:underline">
+                        <Link to="tel:+919172727232" className="flex items-center justify-center gap-2 text-sm text-primary hover:underline">
                           <Phone className="h-4 w-4" />
-                          1800-123-456
+                          +91 917-272-7232
                         </Link>
-                        <Link to="mailto:support@fastagIndia.com" className="flex items-center justify-center gap-2 text-sm text-primary hover:underline">
+                        <Link to="mailto:support@fastagindia.com" className="flex items-center justify-center gap-2 text-sm text-primary hover:underline">
                           <Mail className="h-4 w-4" />
-                          support@fastagIndia.com
+                          business@fastagIndia.com
                         </Link>
                       </div>
                     </div>
@@ -343,13 +454,13 @@ export default function TrackOrderPage() {
                   <div className="text-left">
                     <h4 className="font-medium mb-2">Contact Support</h4>
                     <div className="space-y-1 text-sm text-muted-foreground">
-                      <Link to="tel:+911800123456" className="flex items-center gap-2 hover:text-primary">
+                      <Link to="tel:+91 9172727232" className="flex items-center gap-2 hover:text-primary">
                         <Phone className="h-4 w-4" />
-                        1800-123-456
+                        +91 917-272-7232
                       </Link>
                       <Link to="mailto:support@fastagIndia.com" className="flex items-center gap-2 hover:text-primary">
                         <Mail className="h-4 w-4" />
-                        support@fastagIndia.com
+                        business@fastagIndia.com
                       </Link>
                     </div>
                   </div>

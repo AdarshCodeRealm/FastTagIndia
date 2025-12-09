@@ -35,7 +35,7 @@ export function GetInTouchSection() {
                 <h3 className="font-bold text-xl text-slate-900 mb-2">Customer Support</h3>
                 <p className="text-slate-600 text-sm mb-4">Available 24/7 for all your queries</p>
                 <div className="space-y-2">
-                  <p className="font-semibold text-slate-900 text-lg">1800-XXX-XXXX</p>
+                  <p className="font-semibold text-slate-900 text-lg">+91 9172727232</p>
                   <p className="text-slate-500 text-sm">Toll-free • No charges apply</p>
                 </div>
                 <div className="flex items-center gap-2 mt-4 text-xs text-slate-500">
@@ -56,7 +56,7 @@ export function GetInTouchSection() {
                 <h3 className="font-bold text-xl text-slate-900 mb-2">Email Support</h3>
                 <p className="text-slate-600 text-sm mb-4">Quick response guaranteed within 2 hours</p>
                 <div className="space-y-2">
-                  <p className="font-semibold text-slate-900">support@fastagindia.in</p>
+                  <p className="font-semibold text-slate-900">business@fastagindia.com</p>
                   <p className="text-slate-500 text-sm">Professional assistance</p>
                 </div>
                 <div className="flex items-center gap-2 mt-4 text-xs text-slate-500">
@@ -77,8 +77,8 @@ export function GetInTouchSection() {
                 <h3 className="font-bold text-xl text-slate-900 mb-2">Visit Our Office</h3>
                 <p className="text-slate-600 text-sm mb-4">Meet our team in person for personalized assistance</p>
                 <div className="space-y-2">
-                  <p className="font-semibold text-slate-900">Mumbai Office</p>
-                  <p className="text-slate-500 text-sm">Andheri East, Mumbai<br />Maharashtra, India</p>
+                  <p className="font-semibold text-slate-900">Office No 143, 93Avenue Mall</p>
+                  <p className="text-slate-500 text-sm">Wanowrie, Pune<br />Maharashtra, India</p>
                 </div>
                 <div className="flex items-center gap-2 mt-4 text-xs text-slate-500">
                   <Clock className="h-3 w-3" />
@@ -101,14 +101,14 @@ export function GetInTouchSection() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <a 
-                href="tel:1800XXXXXXX" 
+                href="tel:+919172727232" 
                 className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-xl font-medium transition-all hover:shadow-lg hover:shadow-primary/25"
               >
                 <Phone className="h-4 w-4" />
-                Call Now: 1800-XXX-XXXX
+                Call Now: +91 917-272-7232
               </a>
               <a 
-                href="mailto:support@fastagindia.in" 
+                href="mailto:business@fastagindia.com" 
                 className="inline-flex items-center gap-2 bg-white hover:bg-slate-50 text-slate-900 border border-slate-300 px-6 py-3 rounded-xl font-medium transition-all hover:shadow-md"
               >
                 <Mail className="h-4 w-4" />

@@ -44,7 +44,7 @@ export function CTASection() {
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center text-primary-foreground/80">
             <div className="flex items-center gap-2">
               <Phone className="h-5 w-5" />
-              <span>24/7 Support: 1800-XXX-XXXX</span>
+              <span>24/7 Support: -XXX-XXXX</span>
             </div>
             <div className="hidden sm:block w-1 h-1 bg-primary-foreground/40 rounded-full" />
             <div className="flex items-center gap-2">

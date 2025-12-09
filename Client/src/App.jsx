@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { AuthProvider } from './context/AuthContext'
 import { LoadingScreen } from './components/LoadingScreen'
 import { usePageLoading } from './hooks/usePageLoading'
 import Home from './pages/Home'
@@ -14,6 +15,8 @@ import TollRates from './pages/TollRates'
 import Support from './pages/Support'
 import Resellers from './pages/Resellers'
 import ApiDevelopers from './pages/ApiDevelopers'
+import AdminLogin from './pages/AdminLogin'
+import AdminDashboard from './pages/AdminDashboard'
 
 function AppContent() {
   const isLoading = usePageLoading();
@@ -38,6 +41,10 @@ function AppContent() {
         <Route path="/terms-conditions" element={<TermsConditions />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/refund-policy" element={<RefundPolicy />} />
+        
+        {/* Admin Routes */}
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
       </Routes>
     </div>
   );
@@ -46,7 +53,9 @@ function AppContent() {
 function App() {
   return (
     <Router>
-      <AppContent />
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </Router>
   )
 }

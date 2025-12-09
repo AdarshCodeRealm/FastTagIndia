@@ -33,7 +33,7 @@ class ApiService {
     const url = `${this.baseURL}${endpoint}`;
     
     const config = {
-      credentials: 'include', // Include cookies for web clients
+      credentials: 'include', // Include cookies for CORS requests
       headers: {
         ...this.defaultHeaders,
         ...options.headers,
@@ -49,12 +49,15 @@ class ApiService {
       }
     }
 
-    console.log('🌐 API Request:', {
-      method: config.method || 'GET',
-      url,
-      headers: config.headers,
-      body: config.body ? JSON.parse(config.body) : null,
-    });
+    // Log request details only in development
+    if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+      console.log('🌐 API Request:', {
+        method: config.method || 'GET',
+        url,
+        headers: config.headers,
+        body: config.body ? JSON.parse(config.body) : null,
+      });
+    }
 
     try {
       const response = await fetch(url, config);
@@ -85,13 +88,35 @@ class ApiService {
         }
       }
 
-      const data = await response.json();
+      // Try to parse response as JSON
+      let data;
+      const contentType = response.headers.get('content-type');
+      
+      if (contentType && contentType.includes('application/json')) {
+        try {
+          data = await response.json();
+        } catch (parseError) {
+          console.error('❌ Failed to parse JSON response:', parseError);
+          throw new Error('Invalid response from server');
+        }
+      } else {
+        // If response is not JSON, it might be HTML error page (CORS error from browser)
+        const textData = await response.text();
+        if (textData.includes('<!DOCTYPE') || textData.includes('<html')) {
+          console.error('❌ CORS Error: Server returned HTML instead of JSON');
+          throw new Error('CORS Error: Backend server may not have proper CORS headers configured. Please ensure the backend allows cross-origin requests from ' + window.location.origin);
+        }
+        throw new Error('Server returned invalid response format');
+      }
 
-      console.log('📥 API Response:', {
-        status: response.status,
-        statusText: response.statusText,
-        data,
-      });
+      // Only log in development
+      if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+        console.log('📥 API Response:', {
+          status: response.status,
+          statusText: response.statusText,
+          data,
+        });
+      }
 
       // Handle different error status codes
       if (!response.ok) {
@@ -99,6 +124,10 @@ class ApiService {
           throw new Error('Server error. Please try again later.');
         } else if (response.status === 429) {
           throw new Error('Too many requests. Please wait and try again.');
+        } else if (response.status === 403) {
+          throw new Error('Access forbidden. You do not have permission to access this resource.');
+        } else if (response.status === 404) {
+          throw new Error('Endpoint not found. Please check the API URL configuration.');
         } else {
           throw new Error(data.message || `HTTP ${response.status}: ${response.statusText}`);
         }

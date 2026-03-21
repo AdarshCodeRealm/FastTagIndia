@@ -78,7 +78,7 @@ export function GetInTouchSection() {
                 <p className="text-slate-600 text-sm mb-4">Meet our team in person for personalized assistance</p>
                 <div className="space-y-2">
                   <p className="font-semibold text-slate-900">Office No 143, 93Avenue Mall</p>
-                  <p className="text-slate-500 text-sm">Wanowrie, Pune<br />Maharashtra, India</p>
+                  <p className="text-slate-500 text-sm">Office No.145, 93A/1A1, 93A/2, 93A, 93 Avenue Mall,<br />Wanowrie, Pune City, Pune, Maharashtra, India - 411022</p>
                 </div>
                 <div className="flex items-center gap-2 mt-4 text-xs text-slate-500">
                   <Clock className="h-3 w-3" />

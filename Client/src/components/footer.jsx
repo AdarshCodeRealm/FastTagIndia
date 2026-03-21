@@ -218,9 +218,8 @@ export function Footer() {
                     <h4 className="font-semibold text-white text-sm mb-1">Headquarters</h4>
                     <p className="text-slate-300 text-sm leading-relaxed">
                       FasTagIndia<br />
-                      Office No 145, 93 Avenue Mall<br />
-                      Wanowrie, Pune<br />
-                      Maharashtra 411022, India
+                      Office No.145, 93A/1A1, 93A/2, 93A, 93 Avenue Mall,<br />
+                      Wanowrie, Pune City, Pune, Maharashtra, India - 411022<br />
                     </p>
                   </div>
                 </div>

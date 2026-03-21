@@ -229,9 +229,8 @@ const TermsConditions = () => {
                   <div>
                     <h3 className="font-semibold text-foreground mb-2">FastTagINDIA</h3>
                     <p className="text-muted-foreground text-sm leading-relaxed">
-                      Office No 145, 93 Avenue Mall<br />
-                      Wanowrie, Pune<br />
-                      Maharashtra 411022, India
+                      Office No.145, 93A/1A1, 93A/2, 93A, 93 Avenue Mall,<br />
+                      Wanowrie, Pune City, Pune, Maharashtra, India - 411022<br />
                     </p>
                     <p className="text-muted-foreground text-xs mt-2">
                       A service by <a 

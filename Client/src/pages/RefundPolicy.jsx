@@ -295,9 +295,8 @@ const RefundPolicy = () => {
                     <h3 className="font-semibold text-foreground mb-2">Customer Support</h3>
                     <p className="text-muted-foreground text-sm leading-relaxed">
                       FasTagIndia<br />
-                      Office No 145, 93 Avenue Mall<br />
-                      Wanowrie, Pune<br />
-                      Maharashtra 411022, India
+                      Office No.145, 93A/1A1, 93A/2, 93A, 93 Avenue Mall,<br />
+                      Wanowrie, Pune City, Pune, Maharashtra, India - 411022<br />
                     </p>
                   </div>
                   <div>

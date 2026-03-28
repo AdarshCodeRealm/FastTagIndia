@@ -39,7 +39,7 @@ export function LoadingScreen() {
         {/* Powered By */}
         <div className="text-center text-xs text-muted-foreground mt-4">
           Powered by{" "}
-          <span className="text-foreground font-medium">Nexara International</span>
+          <span className="text-foreground font-medium">Nexara International Private Limited</span>
         </div>
       </div>
     </div>

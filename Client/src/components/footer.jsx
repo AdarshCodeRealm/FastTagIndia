@@ -275,7 +275,7 @@ export function Footer() {
                   rel="noopener noreferrer" 
                   className="text-primary hover:text-primary/80 transition-colors font-medium"
                 >
-                  Nexara International
+                  Nexara International Private Limited
                 </a> • RBI Compliant • ISO 27001 Certified
               </p>
             </div>

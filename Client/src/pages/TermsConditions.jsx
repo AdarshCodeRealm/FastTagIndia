@@ -56,7 +56,7 @@ const TermsConditions = () => {
                   </h2>
                   <div className="prose prose-neutral max-w-none dark:prose-invert">
                     <p className="text-muted-foreground leading-relaxed mb-4">
-                      Welcome to FastTagINDIA ("we," "our," or "us"). These Terms and Conditions ("Terms") govern your use of our FASTag services, website, and mobile application (collectively, the "Service") operated by FastTagINDIA, a service division of Nexara International.
+                      Welcome to FastTagINDIA ("we," "our," or "us"). These Terms and Conditions ("Terms") govern your use of our FASTag services, website, and mobile application (collectively, the "Service") operated by FastTagINDIA, a service division of Nexara International Private Limited.
                     </p>
                     <p className="text-muted-foreground leading-relaxed">
                       By accessing or using our Service, you agree to be bound by these Terms. If you disagree with any part of these terms, then you may not access the Service.
@@ -239,7 +239,7 @@ const TermsConditions = () => {
                         rel="noopener noreferrer" 
                         className="text-primary hover:text-primary/80 transition-colors underline"
                       >
-                        Nexara International
+                        Nexara International Private Limited
                       </a>
                     </p>
                   </div>

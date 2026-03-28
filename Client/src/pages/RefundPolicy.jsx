@@ -49,7 +49,7 @@ const RefundPolicy = () => {
                   </h2>
                   <div className="prose prose-neutral max-w-none dark:prose-invert">
                     <p className="text-muted-foreground leading-relaxed mb-4">
-                      At FastTagINDIA, a service division of Nexara International, we strive to provide excellent service and customer satisfaction. This Refund Policy outlines the terms and conditions for refunds, cancellations, and returns related to our FASTag services.
+                      At FastTagINDIA, a service division of Nexara International Private Limited, we strive to provide excellent service and customer satisfaction. This Refund Policy outlines the terms and conditions for refunds, cancellations, and returns related to our FASTag services.
                     </p>
                     <p className="text-muted-foreground leading-relaxed">
                       Please read this policy carefully to understand your rights and our procedures regarding refunds.

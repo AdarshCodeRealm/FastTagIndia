@@ -48,7 +48,7 @@ export function Header() {
             </div>
             <div className="hidden md:flex items-center gap-1">
               <Zap className="h-3.5 w-3.5" />
-              <span className="font-medium">Instant FASTag activation | Powered by <a href="https://nexaraintl.com/" target="_blank" className="text-white underline">Nexara International</a></span>
+              <span className="font-medium">Instant FASTag activation | Powered by <a href="https://nexaraintl.com/" target="_blank" className="text-white underline">Nexara International Private Limited</a></span>
             </div>
             <div className="flex items-center gap-4">
               {isAuthenticated ? (

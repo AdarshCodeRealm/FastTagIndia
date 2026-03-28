@@ -250,7 +250,7 @@ const TermsConditions = () => {
                         href="mailto:business@fastagindia.in?subject=Terms and Conditions Inquiry" 
                         className="hover:text-primary transition-colors underline"
                         target="_blank"
-                        rel="noopener noreferrer"
+                        rel="noopener noreferrer" 
                       >
                         business@fastagindia.in
                       </a><br />

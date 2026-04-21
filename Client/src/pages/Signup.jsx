@@ -59,11 +59,16 @@ export default function SignupPage() {
       return
     }
 
-    const registerResult = await registerUser({
-      name: formData.fullName,
-      phone: formData.phone,
-      email: formData.email,
-    })
+      const registerPayload = {
+        name: formData.fullName,
+        phone: formData.phone,
+      }
+
+      if (formData.email.trim()) {
+        registerPayload.email = formData.email.trim()
+      }
+
+      const registerResult = await registerUser(registerPayload)
 
     if (registerResult.success) {
       navigate('/login')
@@ -75,7 +80,6 @@ export default function SignupPage() {
   const isStep1Valid =
     formData.fullName.length > 2 &&
     formData.phone.length === 10 &&
-    formData.email.includes('@') &&
     formData.agreeTerms
 
   return (
@@ -222,7 +226,7 @@ export default function SignupPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email Address</Label>
+                    <Label htmlFor="email">Email Address <span className="text-muted-foreground">(Optional)</span></Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
@@ -232,7 +236,6 @@ export default function SignupPage() {
                         className="pl-10"
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        required
                       />
                     </div>
                   </div>

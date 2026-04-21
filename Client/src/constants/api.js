@@ -11,5 +11,5 @@ const getApiBaseUrl = () => {
   return isProduction ? 'https://nexara-server.vercel.app/api' : 'http://localhost:8000/api';
 };
 
-// export const BASE_URL = 'http://localhost:8000/api';
-export const BASE_URL = 'https://api.paydoot.com/api';
+export const BASE_URL = 'http://localhost:8000/api';
+// export const BASE_URL = 'https://api.paydoot.com/api';

@@ -9,8 +9,8 @@ import { useAuth } from '../context/AuthContext'
 
 export default function LoginPage() {
   const navigate = useNavigate()
-  const { loginUser, isLoading, error, clearError } = useAuth()
-  const [loginMethod, setLoginMethod] = useState('email') // Default to email since that's what you're testing
+  const { loginUser, sendSMSOTP, verifySMSOTP, isLoading, error, clearError } = useAuth()
+  const [loginMethod, setLoginMethod] = useState('phone')
   const [formData, setFormData] = useState({
     phone: '',
     email: '',
@@ -21,8 +21,15 @@ export default function LoginPage() {
   const [loginError, setLoginError] = useState('')
 
   const handleSendOtp = async () => {
-    // OTP functionality can be implemented later
-    setOtpSent(true)
+    setLoginError('')
+    clearError()
+
+    const result = await sendSMSOTP(formData.phone, 'login')
+    if (result.success) {
+      setOtpSent(true)
+    } else {
+      setLoginError(result.error || 'Failed to send OTP. Please try again.')
+    }
   }
 
   const handleLogin = async (e) => {
@@ -49,9 +56,13 @@ export default function LoginPage() {
         setLoginError(result.error || 'Login failed. Please try again.')
       }
     } else {
-      // OTP login logic can be implemented here
-      console.log('📱 OTP login not implemented yet')
-      setLoginError('OTP login is not implemented yet. Please use email login.')
+      const result = await verifySMSOTP(formData.phone, formData.otp, 'login')
+
+      if (result.success) {
+        navigate('/buy-fastag')
+      } else {
+        setLoginError(result.error || 'OTP verification failed. Please try again.')
+      }
     }
   }
 

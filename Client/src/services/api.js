@@ -1,7 +1,7 @@
 // API Service for FASTag India Backend Integration
 import config from '../config/environment';
-import axios from 'axios';
-const API_BASE_URL = config.API_BASE_URL;
+import { BASE_URL } from '../constants/api';
+const API_BASE_URL = BASE_URL;
 
 class ApiService {
   constructor() {
@@ -256,11 +256,13 @@ class ApiService {
   }
 
   // Send SMS OTP
-  async sendSMSOTP(phone, purpose = 'login') {
+  async sendSMSOTP(phone, purpose = 'login', otpContext = {}) {
     console.log('📱 API: Sending SMS OTP to:', phone);
+    const origin = otpContext.origin || config.OTP_ORIGIN || 'fasttag';
+    const fasttag = typeof otpContext.fasttag === 'boolean' ? otpContext.fasttag : origin === 'fasttag';
     return this.makeRequest('/auth/send-sms-otp', {
       method: 'POST',
-      body: JSON.stringify({ phone, purpose }),
+      body: JSON.stringify({ phone, purpose, origin, fasttag }),
     });
   }
 
@@ -274,11 +276,17 @@ class ApiService {
   }
 
   // Verify SMS OTP
-  async verifySMSOTP(phone, otp, purpose = 'login') {
+  async verifySMSOTP(phone, otp, purpose = 'login', otpContext = {}) {
     console.log('✅ API: Verifying SMS OTP');
     return this.makeRequest('/auth/verify-sms-otp', {
       method: 'POST',
-      body: JSON.stringify({ phone, otp, purpose }),
+      body: JSON.stringify({
+        phone,
+        otp,
+        purpose,
+        origin: otpContext.origin || config.OTP_ORIGIN || 'fasttag',
+        fasttag: typeof otpContext.fasttag === 'boolean' ? otpContext.fasttag : (otpContext.origin || config.OTP_ORIGIN || 'fasttag') === 'fasttag',
+      }),
     });
   }
 

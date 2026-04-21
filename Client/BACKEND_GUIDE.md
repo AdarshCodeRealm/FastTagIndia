@@ -364,6 +364,138 @@ POST /api/admin/auth/enable-2fa
 POST /api/admin/auth/verify-2fa
 ```
 
+### SMS OTP Multi-Website Routing Guide (No Login or Signup Logic Change)
+
+Use this approach when one backend serves multiple websites and you want different SMS branding/templates.
+
+#### 1) Request body contract from frontend
+
+Frontend should send these fields to `POST /api/auth/send-sms-otp`:
+
+- `phone` (string, required)
+- `purpose` (string, required): `login` or `register` or `forgot-password`
+- `fasttag` (boolean, optional): `true` if request is from FASTag website
+- `origin` (string, optional): website key, for example `fasttag`, `site2`
+
+Example request:
+
+```json
+{
+  "phone": "9876543210",
+  "purpose": "register",
+  "fasttag": true,
+  "origin": "fasttag"
+}
+```
+
+#### 2) Keep auth flow same, only switch SMS utility
+
+Do not change register/login logic. Only update OTP send flow to choose SMS sender utility based on body flags.
+
+```javascript
+// controllers/auth/userAuthController.js
+const otpService = require('../../services/otpService');
+const { sendFasttagOtpSMS, sendDefaultOtpSMS } = require('../../services/sms');
+
+const resolveWebsiteContext = (body) => {
+  const isFasttag = body.fasttag === true || body.origin === 'fasttag';
+  if (isFasttag) {
+    return {
+      site: 'fasttag',
+      smsSender: sendFasttagOtpSMS,
+      templateKey: 'FASTTAG_OTP'
+    };
+  }
+
+  return {
+    site: body.origin || 'default',
+    smsSender: sendDefaultOtpSMS,
+    templateKey: 'DEFAULT_OTP'
+  };
+};
+
+const sendSmsOtp = async (req, res) => {
+  try {
+    const { phone, purpose } = req.body;
+    if (!phone || !purpose) {
+      return res.status(400).json({ success: false, message: 'phone and purpose are required' });
+    }
+
+    const context = resolveWebsiteContext(req.body);
+    const otp = await otpService.generateOtp({
+      phone,
+      purpose,
+      site: context.site
+    });
+
+    await context.smsSender({
+      phone,
+      otp,
+      templateKey: context.templateKey,
+      purpose
+    });
+
+    return res.json({ success: true, message: 'OTP sent successfully' });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: 'Failed to send OTP' });
+  }
+};
+
+module.exports = { sendSmsOtp };
+```
+
+#### 3) Verify OTP endpoint recommendation
+
+For `POST /api/auth/verify-sms-otp`, keep current verification logic. If you store site/origin with OTP record, include site during verification lookup to avoid cross-site OTP reuse.
+
+```javascript
+const verifySmsOtp = async (req, res) => {
+  const { phone, otp, purpose } = req.body;
+  const site = req.body.fasttag === true || req.body.origin === 'fasttag'
+    ? 'fasttag'
+    : (req.body.origin || 'default');
+
+  const isValid = await otpService.verifyOtp({ phone, otp, purpose, site });
+  if (!isValid) {
+    return res.status(400).json({ success: false, message: 'Invalid OTP' });
+  }
+
+  return res.json({ success: true, message: 'OTP verified successfully' });
+};
+```
+
+#### 4) Service layer split (clean and minimal)
+
+```javascript
+// services/sms/index.js
+const sendFasttagOtpSMS = async ({ phone, otp, templateKey, purpose }) => {
+  // Use FASTag route/template/provider settings
+  // Example: MSG91 template for FASTag brand
+};
+
+const sendDefaultOtpSMS = async ({ phone, otp, templateKey, purpose }) => {
+  // Use default route/template/provider settings
+};
+
+module.exports = { sendFasttagOtpSMS, sendDefaultOtpSMS };
+```
+
+#### 5) Validation and security checks
+
+- Accept only known origins (`fasttag`, `site2`, etc.)
+- Rate limit OTP routes per phone and IP
+- Keep OTP TTL short (for example, 5 minutes)
+- Never expose OTP in API response or logs
+- Use same response shape for both utilities
+
+#### 6) Rollout checklist
+
+- Add utility selector in send OTP controller
+- Keep login/register controllers untouched
+- Add unit test for `fasttag: true` route
+- Add unit test for default route
+- Add integration test for `register` OTP flow
+
 ### User Routes
 ```javascript
 // routes/user/profile.js

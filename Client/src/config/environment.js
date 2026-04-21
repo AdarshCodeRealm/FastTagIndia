@@ -1,4 +1,6 @@
 // Environment Configuration for FASTag India Frontend
+import { BASE_URL } from '../constants/api';
+
 // Helper function to safely get environment variables
 const getEnvVar = (key, defaultValue = null) => {
   try {
@@ -17,13 +19,13 @@ const isProduction = typeof window !== 'undefined' && window.location.hostname !
 
 const config = {
   // API Configuration - Use environment variable or default based on environment
-  API_BASE_URL: getEnvVar('VITE_API_URL') || 
-    (isProduction ? 'https://nexara-server.vercel.app/api' : 'http://localhost:3001/api'),
+  API_BASE_URL: BASE_URL,
   
   // App Configuration
   APP_NAME: 'FASTag India',
   APP_VERSION: getEnvVar('VITE_APP_VERSION', '1.0.0'),
   APP_URL: getEnvVar('VITE_APP_URL', isProduction ? 'https://fasttag-india.vercel.app' : 'http://localhost:3000'),
+  OTP_ORIGIN: getEnvVar('VITE_OTP_ORIGIN', 'fasttag'),
   
   // Payment Gateway
   RAZORPAY_KEY_ID: getEnvVar('VITE_RAZORPAY_KEY_ID'),
@@ -97,6 +99,7 @@ if (config.IS_DEVELOPMENT) {
     NODE_ENV: config.NODE_ENV,
     API_BASE_URL: config.API_BASE_URL,
     APP_URL: config.APP_URL,
+    OTP_ORIGIN: config.OTP_ORIGIN,
     IS_PRODUCTION: config.IS_PRODUCTION,
   });
 }

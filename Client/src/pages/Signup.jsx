@@ -1,61 +1,85 @@
-import  { useState } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { Label } from '../components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Checkbox } from '../components/ui/checkbox'
-import { Car, Phone, Mail, Lock, User, ArrowRight, CheckCircle2, ArrowLeft, Home } from 'lucide-react'
+import { Car, Phone, Mail, User, ArrowRight, ArrowLeft, Home, CheckCircle2 } from 'lucide-react'
+import { useAuth } from '../context/AuthContext'
+import config from '../config/environment'
 
 export default function SignupPage() {
   const navigate = useNavigate()
-  const [isLoading, setIsLoading] = useState(false)
+  const { sendSMSOTP, verifySMSOTP, registerUser, isLoading, error, clearError } = useAuth()
   const [step, setStep] = useState(1)
   const [formData, setFormData] = useState({
     fullName: '',
     phone: '',
     email: '',
-    password: '',
-    confirmPassword: '',
     otp: '',
     agreeTerms: false,
   })
-  const [otpSent, setOtpSent] = useState(false)
+  const [signupError, setSignupError] = useState('')
+  const otpContext = {
+    origin: config.OTP_ORIGIN || 'fasttag',
+    fasttag: true,
+  }
 
   const handleContinueToOtp = async () => {
-    setIsLoading(true)
-    // Simulate sending OTP
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-    setOtpSent(true)
-    setStep(2)
-    setIsLoading(false)
+    setSignupError('')
+    clearError()
+
+    const result = await sendSMSOTP(formData.phone, 'register', otpContext)
+    if (result.success) {
+      setStep(2)
+    } else {
+      setSignupError(result.error || 'Failed to send OTP. Please try again.')
+    }
   }
 
   const handleResendOtp = async () => {
-    setIsLoading(true)
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-    setIsLoading(false)
+    setSignupError('')
+    clearError()
+
+    const result = await sendSMSOTP(formData.phone, 'register', otpContext)
+    if (!result.success) {
+      setSignupError(result.error || 'Failed to resend OTP. Please try again.')
+    }
   }
 
   const handleSignup = async (e) => {
     e.preventDefault()
-    setIsLoading(true)
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-    setIsLoading(false)
-    navigate('/login')
+    setSignupError('')
+    clearError()
+
+    const verifyResult = await verifySMSOTP(formData.phone, formData.otp, 'register', otpContext)
+    if (!verifyResult.success) {
+      setSignupError(verifyResult.error || 'OTP verification failed. Please try again.')
+      return
+    }
+
+    const registerResult = await registerUser({
+      name: formData.fullName,
+      phone: formData.phone,
+      email: formData.email,
+    })
+
+    if (registerResult.success) {
+      navigate('/login')
+    } else {
+      setSignupError(registerResult.error || 'Registration failed. Please try again.')
+    }
   }
 
   const isStep1Valid =
     formData.fullName.length > 2 &&
     formData.phone.length === 10 &&
     formData.email.includes('@') &&
-    formData.password.length >= 6 &&
-    formData.password === formData.confirmPassword &&
     formData.agreeTerms
 
   return (
     <div className="min-h-screen bg-muted/30 flex">
-      {/* Left Side - Branding */}
       <div className="hidden lg:flex lg:w-1/2 bg-primary relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-primary/80" />
         <div className="relative z-10 flex flex-col justify-center px-12 xl:px-20 text-primary-foreground">
@@ -101,12 +125,10 @@ export default function SignupPage() {
           </div>
         </div>
 
-        {/* Decorative Elements */}
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-primary-foreground/5 rounded-full translate-x-1/2 translate-y-1/2" />
         <div className="absolute top-20 right-20 w-32 h-32 bg-primary-foreground/5 rounded-full" />
       </div>
 
-      {/* Right Side - Signup Form */}
       <div className="flex-1 flex items-center justify-center p-6 lg:p-12">
         <div className="w-full max-w-md">
           <div className="flex items-center justify-between mb-8">
@@ -155,14 +177,17 @@ export default function SignupPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
+              {(error || signupError) && (
+                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <div className="text-sm text-red-800">
+                    <p className="font-medium">Signup Failed</p>
+                    <p>{error || signupError}</p>
+                  </div>
+                </div>
+              )}
+
               {step === 1 ? (
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault()
-                    handleContinueToOtp()
-                  }}
-                  className="space-y-4"
-                >
+                <form onSubmit={(e) => { e.preventDefault(); handleContinueToOtp(); }} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="fullName">Full Name</Label>
                     <div className="relative">
@@ -189,7 +214,7 @@ export default function SignupPage() {
                         placeholder="Enter 10-digit mobile number"
                         className="pl-10"
                         value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, '') })}
                         maxLength={10}
                         required
                       />
@@ -210,41 +235,6 @@ export default function SignupPage() {
                         required
                       />
                     </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="password"
-                        type="password"
-                        placeholder="Create a password (min 6 characters)"
-                        className="pl-10"
-                        value={formData.password}
-                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Confirm Password</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="confirmPassword"
-                        type="password"
-                        placeholder="Confirm your password"
-                        className="pl-10"
-                        value={formData.confirmPassword}
-                        onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                        required
-                      />
-                    </div>
-                    {formData.confirmPassword && formData.password !== formData.confirmPassword && (
-                      <p className="text-xs text-destructive">Passwords do not match</p>
-                    )}
                   </div>
 
                   <div className="flex items-start space-x-2">
@@ -275,7 +265,6 @@ export default function SignupPage() {
                   </Button>
                 </form>
               ) : (
-                /* Step 2 - OTP Verification */
                 <form onSubmit={handleSignup} className="space-y-4">
                   <div className="bg-muted/50 rounded-lg p-4 mb-4">
                     <p className="text-sm text-muted-foreground">We&apos;ve sent a 6-digit OTP to</p>
@@ -289,11 +278,20 @@ export default function SignupPage() {
                       type="text"
                       placeholder="Enter 6-digit OTP"
                       value={formData.otp}
-                      onChange={(e) => setFormData({ ...formData, otp: e.target.value })}
+                      onChange={(e) => setFormData({ ...formData, otp: e.target.value.replace(/\D/g, '').slice(0, 6) })}
                       maxLength={6}
-                      className="text-center text-lg tracking-widest"
                       required
                     />
+                    <p className="text-xs text-muted-foreground">
+                      OTP sent to +91 {formData.phone}{' '}
+                      <button
+                        type="button"
+                        className="text-primary hover:underline"
+                        onClick={() => setStep(1)}
+                      >
+                        Change
+                      </button>
+                    </p>
                   </div>
 
                   <div className="flex items-center justify-between text-sm">

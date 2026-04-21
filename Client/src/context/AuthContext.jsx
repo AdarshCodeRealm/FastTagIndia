@@ -301,12 +301,12 @@ export function AuthProvider({ children }) {
   };
 
   // Send SMS OTP
-  const sendSMSOTP = async (phone, purpose = 'login') => {
+  const sendSMSOTP = async (phone, purpose = 'login', otpContext = {}) => {
     console.log('📱 AuthContext: Sending SMS OTP');
     dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: true });
     
     try {
-      const result = await apiService.sendSMSOTP(phone, purpose);
+      const result = await apiService.sendSMSOTP(phone, purpose, otpContext);
       
       if (result.success) {
         dispatch({ 
@@ -361,12 +361,12 @@ export function AuthProvider({ children }) {
   };
 
   // Verify SMS OTP
-  const verifySMSOTP = async (phone, otp, purpose = 'login') => {
+  const verifySMSOTP = async (phone, otp, purpose = 'login', otpContext = {}) => {
     console.log('✅ AuthContext: Verifying SMS OTP');
     dispatch({ type: AUTH_ACTIONS.LOGIN_START });
     
     try {
-      const result = await apiService.verifySMSOTP(phone, otp, purpose);
+      const result = await apiService.verifySMSOTP(phone, otp, purpose, otpContext);
       
       if (result.success) {
         if (purpose === 'login' && result.data.user) {

@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -10,7 +11,7 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
-import { Phone, Menu, Zap, CreditCard, Building2, Users, Code, Car, User, LogOut, CheckCircle2, RefreshCw, Shield } from "lucide-react";
+import { Phone, Menu, Zap, CreditCard, Building2, Users, Code, Car, User, LogOut, CheckCircle2, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
 
@@ -18,12 +19,8 @@ export function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
   const { isAuthenticated, user, logout } = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
-
   const handleLogout = async () => {
-    setIsLoading(true);
     await logout();
-    setIsLoading(false);
     setIsOpen(false);
   };
 
@@ -266,12 +263,12 @@ export function Header() {
                     </div>
                   )}
 
-                  <nav className="flex flex-col gap-4 mt-8">
-                    <Link to="/" className="text-lg font-medium" onClick={() => setIsOpen(false)}>
+                  <nav className="flex flex-col gap-2 mt-8">
+                    <Link to="/" className="rounded-lg px-3 py-3 text-lg font-medium hover:bg-muted" onClick={() => setIsOpen(false)}>
                       Home
                     </Link>
                     <button 
-                      className="text-lg font-medium text-left" 
+                      className="rounded-lg px-3 py-3 text-left text-lg font-medium hover:bg-muted" 
                       onClick={() => {
                         setIsOpen(false)
                         handleAuthenticatedAction('/buy-fastag')
@@ -280,7 +277,7 @@ export function Header() {
                       Buy FASTag
                     </button>
                     <button 
-                      className="text-lg font-medium text-left" 
+                      className="rounded-lg px-3 py-3 text-left text-lg font-medium hover:bg-muted" 
                       onClick={() => {
                         setIsOpen(false)
                         handleAuthenticatedAction('/recharge-fastag')
@@ -288,19 +285,19 @@ export function Header() {
                     >
                       Recharge
                     </button>
-                    <Link to="/toll-rates" className="text-lg font-medium" onClick={() => setIsOpen(false)}>
+                    <Link to="/toll-rates" className="rounded-lg px-3 py-3 text-lg font-medium hover:bg-muted" onClick={() => setIsOpen(false)}>
                       Toll Rates
                     </Link>
-                    <Link to="/track-order" className="text-lg font-medium" onClick={() => setIsOpen(false)}>
+                    <Link to="/track-order" className="rounded-lg px-3 py-3 text-lg font-medium hover:bg-muted" onClick={() => setIsOpen(false)}>
                       Track Order
                     </Link>
-                    <Link to="/resellers" className="text-lg font-medium" onClick={() => setIsOpen(false)}>
+                    <Link to="/resellers" className="rounded-lg px-3 py-3 text-lg font-medium hover:bg-muted" onClick={() => setIsOpen(false)}>
                       Resellers
                     </Link>
-                    <Link to="/api" className="text-lg font-medium" onClick={() => setIsOpen(false)}>
+                    <Link to="/api" className="rounded-lg px-3 py-3 text-lg font-medium hover:bg-muted" onClick={() => setIsOpen(false)}>
                       API & Partners
                     </Link>
-                    <Link to="/support" className="text-lg font-medium" onClick={() => setIsOpen(false)}>
+                    <Link to="/support" className="rounded-lg px-3 py-3 text-lg font-medium hover:bg-muted" onClick={() => setIsOpen(false)}>
                       Support
                     </Link>
 

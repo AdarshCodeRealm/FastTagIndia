@@ -330,6 +330,36 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // Send Signup OTP
+  const sendSignupOTP = async (phone, purpose = 'signup', otpContext = {}) => {
+    console.log('📱 AuthContext: Sending signup OTP');
+    dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: true });
+
+    try {
+      const result = await apiService.sendSignupOTP(phone, purpose, otpContext);
+
+      if (result.success) {
+        dispatch({
+          type: AUTH_ACTIONS.SET_OTP_STEP,
+          payload: {
+            isActive: true,
+            type: 'sms',
+            identifier: phone,
+            purpose: purpose,
+          }
+        });
+        dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
+        return { success: true, data: result.data };
+      }
+
+      throw new Error(result.message || 'Failed to send signup OTP');
+    } catch (error) {
+      console.error('❌ Send Signup OTP error:', error);
+      dispatch({ type: AUTH_ACTIONS.LOGIN_ERROR, payload: error.message });
+      return { success: false, error: error.message };
+    }
+  };
+
   // Verify Email OTP
   const verifyEmailOTP = async (email, otp, purpose = 'login') => {
     console.log('✅ AuthContext: Verifying email OTP');
@@ -385,6 +415,28 @@ export function AuthProvider({ children }) {
       }
     } catch (error) {
       console.error('❌ Verify SMS OTP error:', error);
+      dispatch({ type: AUTH_ACTIONS.LOGIN_ERROR, payload: error.message });
+      return { success: false, error: error.message };
+    }
+  };
+
+  // Signup With OTP
+  const signupWithOTP = async (userData, otpContext = {}) => {
+    console.log('👤 AuthContext: Signup with OTP');
+    dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: true });
+
+    try {
+      const result = await apiService.signupWithOTP(userData, otpContext);
+
+      if (result.success) {
+        dispatch({ type: AUTH_ACTIONS.CLEAR_OTP_STEP });
+        dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
+        return { success: true, data: result.data, message: result.message };
+      }
+
+      throw new Error(result.message || 'Signup with OTP failed');
+    } catch (error) {
+      console.error('❌ Signup with OTP error:', error);
       dispatch({ type: AUTH_ACTIONS.LOGIN_ERROR, payload: error.message });
       return { success: false, error: error.message };
     }
@@ -598,8 +650,10 @@ export function AuthProvider({ children }) {
     // OTP Actions
     sendEmailOTP,
     sendSMSOTP,
+    sendSignupOTP,
     verifyEmailOTP,
     verifySMSOTP,
+    signupWithOTP,
     loginWithOTP,
     
     // Admin Actions

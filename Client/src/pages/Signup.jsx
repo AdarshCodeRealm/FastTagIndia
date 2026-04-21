@@ -8,10 +8,11 @@ import { Checkbox } from '../components/ui/checkbox'
 import { Car, Phone, Mail, User, ArrowRight, ArrowLeft, Home, CheckCircle2 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import config from '../config/environment'
+import toast from 'react-hot-toast'
 
 export default function SignupPage() {
   const navigate = useNavigate()
-  const { sendSMSOTP, verifySMSOTP, registerUser, isLoading, error, clearError } = useAuth()
+  const { sendSignupOTP, signupWithOTP, isLoading, error, clearError } = useAuth()
   const [step, setStep] = useState(1)
   const [formData, setFormData] = useState({
     fullName: '',
@@ -30,7 +31,7 @@ export default function SignupPage() {
     setSignupError('')
     clearError()
 
-    const result = await sendSMSOTP(formData.phone, 'register', otpContext)
+    const result = await sendSignupOTP(formData.phone, 'signup', otpContext)
     if (result.success) {
       setStep(2)
     } else {
@@ -42,7 +43,7 @@ export default function SignupPage() {
     setSignupError('')
     clearError()
 
-    const result = await sendSMSOTP(formData.phone, 'register', otpContext)
+    const result = await sendSignupOTP(formData.phone, 'signup', otpContext)
     if (!result.success) {
       setSignupError(result.error || 'Failed to resend OTP. Please try again.')
     }
@@ -53,28 +54,22 @@ export default function SignupPage() {
     setSignupError('')
     clearError()
 
-    const verifyResult = await verifySMSOTP(formData.phone, formData.otp, 'register', otpContext)
-    if (!verifyResult.success) {
-      setSignupError(verifyResult.error || 'OTP verification failed. Please try again.')
+    const signupPayload = {
+      name: formData.fullName.trim(),
+      mobile: formData.phone,
+      email: formData.email.trim() || undefined,
+      otp: formData.otp,
+      purpose: 'signup',
+    }
+
+    const signupResult = await signupWithOTP(signupPayload, otpContext)
+    if (!signupResult.success) {
+      setSignupError(signupResult.error || 'Signup failed. Please try again.')
       return
     }
 
-      const registerPayload = {
-        name: formData.fullName,
-        phone: formData.phone,
-      }
-
-      if (formData.email.trim()) {
-        registerPayload.email = formData.email.trim()
-      }
-
-      const registerResult = await registerUser(registerPayload)
-
-    if (registerResult.success) {
-      navigate('/login')
-    } else {
-      setSignupError(registerResult.error || 'Registration failed. Please try again.')
-    }
+    toast.success('User created successfully')
+    navigate('/login')
   }
 
   const isStep1Valid =

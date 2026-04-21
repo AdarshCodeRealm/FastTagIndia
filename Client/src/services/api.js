@@ -266,6 +266,17 @@ class ApiService {
     });
   }
 
+  // Send Signup OTP
+  async sendSignupOTP(phone, purpose = 'signup', otpContext = {}) {
+    console.log('📱 API: Sending signup OTP to:', phone);
+    const origin = otpContext.origin || config.OTP_ORIGIN || 'fasttag';
+    const fasttag = typeof otpContext.fasttag === 'boolean' ? otpContext.fasttag : origin === 'fasttag';
+    return this.makeRequest('/auth/send-otp', {
+      method: 'POST',
+      body: JSON.stringify({ phone, purpose, origin, fasttag }),
+    });
+  }
+
   // Verify Email OTP
   async verifyEmailOTP(email, otp, purpose = 'login') {
     console.log('✅ API: Verifying email OTP');
@@ -286,6 +297,31 @@ class ApiService {
         purpose,
         origin: otpContext.origin || config.OTP_ORIGIN || 'fasttag',
         fasttag: typeof otpContext.fasttag === 'boolean' ? otpContext.fasttag : (otpContext.origin || config.OTP_ORIGIN || 'fasttag') === 'fasttag',
+      }),
+    });
+  }
+
+  // Complete Signup With OTP
+  async signupWithOTP(userData, otpContext = {}) {
+    console.log('👤 API: Completing signup with OTP:', {
+      name: userData.name,
+      email: userData.email,
+      mobile: userData.mobile || userData.phone,
+    });
+
+    const origin = otpContext.origin || config.OTP_ORIGIN || 'fasttag';
+    const fasttag = typeof otpContext.fasttag === 'boolean' ? otpContext.fasttag : origin === 'fasttag';
+
+    return this.makeRequest('/auth/signup-with-otp', {
+      method: 'POST',
+      body: JSON.stringify({
+        name: userData.name,
+        email: userData.email,
+        mobile: userData.mobile || userData.phone,
+        otp: userData.otp,
+        purpose: userData.purpose || 'signup',
+        origin,
+        fasttag,
       }),
     });
   }

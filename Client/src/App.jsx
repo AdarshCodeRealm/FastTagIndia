@@ -17,6 +17,7 @@ import Resellers from './pages/Resellers'
 import ApiDevelopers from './pages/ApiDevelopers'
 import AdminLogin from './pages/AdminLogin'
 import AdminDashboard from './pages/AdminDashboard'
+import { Toaster } from 'react-hot-toast'
 
 function AppContent() {
   const isLoading = usePageLoading();
@@ -27,6 +28,7 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />

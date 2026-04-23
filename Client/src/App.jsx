@@ -13,6 +13,7 @@ import PrivacyPolicy from './pages/PrivacyPolicy'
 import RefundPolicy from './pages/RefundPolicy'
 import TollRates from './pages/TollRates'
 import Support from './pages/Support'
+import AboutUs from './pages/AboutUs'
 import Resellers from './pages/Resellers'
 import ApiDevelopers from './pages/ApiDevelopers'
 import AdminLogin from './pages/AdminLogin'
@@ -38,6 +39,7 @@ function AppContent() {
         <Route path="/track-order" element={<TrackOrder />} />
         <Route path="/toll-rates" element={<TollRates />} />
         <Route path="/support" element={<Support />} />
+        <Route path="/about-us" element={<AboutUs />} />
         <Route path="/resellers" element={<Resellers />} />
         <Route path="/api" element={<ApiDevelopers />} />
         <Route path="/terms-conditions" element={<TermsConditions />} />

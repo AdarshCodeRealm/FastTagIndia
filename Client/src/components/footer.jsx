@@ -14,7 +14,7 @@ const navigationSections = {
     { name: "Contact Us", href: "/support" }, // → Redirect to support page
   ],
   company: [
-    { name: "About Us", href: "/" }, // → Redirect to home (doesn't exist)
+    { name: "About Us", href: "/about-us" }, // ✅ Exists
     { name: "Careers", href: "/" }, // → Redirect to home (doesn't exist)
     { name: "Press", href: "/" }, // → Redirect to home (doesn't exist)
     { name: "Partners", href: "/" }, // → Redirect to home (doesn't exist)

@@ -187,6 +187,14 @@ export function Header() {
                     </NavigationMenuLink>
                   </Link>
                 </NavigationMenuItem>
+
+                <NavigationMenuItem>
+                  <Link to="/about-us">
+                    <NavigationMenuLink className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-muted hover:text-foreground focus:bg-muted focus:text-foreground focus:outline-none">
+                      About Us
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
               </NavigationMenuList>
             </NavigationMenu>
 
@@ -299,6 +307,9 @@ export function Header() {
                     </Link>
                     <Link to="/support" className="rounded-lg px-3 py-3 text-lg font-medium hover:bg-muted" onClick={() => setIsOpen(false)}>
                       Support
+                    </Link>
+                    <Link to="/about-us" className="rounded-lg px-3 py-3 text-lg font-medium hover:bg-muted" onClick={() => setIsOpen(false)}>
+                      About Us
                     </Link>
 
                     {/* Admin Link in Mobile Menu */}
